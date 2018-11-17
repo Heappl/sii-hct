@@ -32,11 +32,19 @@ app.get('/area', function(req, res) {
   res.render('pages/index', {content: 'area', user: user});
 });
 
+app.get('/wtf', function(req, res) {
+  res.render('pages/index', {content: 'wtf', user: user});
+});
+
 app.get('/guildchat', function(req, res) {
   res.render('pages/index', {content: 'guildchat', user: user});
 });
 
-io.on('connection', function(socket){
+app.get('/bugreport', function(req, res) {
+  res.render('pages/index', {content: 'bugreport', user: user});
+});
+
+io.on('connection', function(socket) {
   socket.broadcast.emit('chat_redcats', '(new user joined chat)');
   socket.on('disconnect', function(){
     socket.broadcast.emit('chat_redcats', '(user left chat)');
@@ -44,4 +52,6 @@ io.on('connection', function(socket){
   socket.on('chat_redcats', function(msg){
     io.emit('chat_redcats', msg);
   });
+
+  socket.on('feedback', function(msg){ console.log(msg); })
 });

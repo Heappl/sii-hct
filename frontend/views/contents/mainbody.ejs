@@ -11,35 +11,17 @@
     <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_content">            
+                <h5>You are ranked 2nd.</h5>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <strong>Oh no!</strong> Your area is under attack... fight back!
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            
-            <p>Guild Area shield level:</p>
-            <div class="progress">
-                <div class="progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"> 25%</div>
-            </div>
-            <p class="label">Artefact hunt progress:</p>
-            <div class="progress">
-                <div class="progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 85%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"> 85%</div>
-            </div>
-            <br/>
-            <h3>You are ranked 2nd.</h3>
-            <style>
-            .tileset {
-                width: 32px;
-                height: 32px;
-                background: url('/gfx/tileset32x32.png');
-            }
-            </style>
-            <h5>Ground level:</h5>
-            <a href="javascript:add_computer(0)" class="buy_pc">Buy Computer</a>
-            <a href="javascript:add_computer(1)" class="buy_pc">Upgrade Computer</a>
+
+            <button type="button" class="btn btn-primary" onclick="javascript:add_computer(0)">Buy Laser Unit</button>
+            <button type="button" class="btn btn-info" onclick="javascript:add_computer(1)">Upgrade Laser Unit</button>
             <div class="base3"></div>
-            <h5>Level -1: </h5>
             <div class="base2"></div>
             <div class="equipment">
                 <h3>Cats you saved from aliens:</h3>
@@ -50,8 +32,8 @@
             </div>
             <script>
                 var base0 = [[5, 6, 7], [5 + 14, 6 + 14, 7 + 14], [5 + 14*2, 6 + 14*2, 7 + 14*2]];
-                var base1 = [[5, 6, 7], [5 + 14, 2, 7 + 14], [5 + 14*2, 6 + 14*2, 7 + 14*2]];
-                var base2 = [[5, 6, 6, 6, 7], [5 + 14, 3 * 14 +1, 6 + 14, 2, 7 + 14], [5 + 14*2, 6 + 14*2, 6 + 14*2, 6 + 14*2, 7 + 14*2]];
+                var base1 = [[5, 0, 7], [5 + 14, 2, 7 + 14], [5 + 14*2, 6 + 14*2, 7 + 14*2]];
+                var base2 = [[5, 6, 6, 6, 7], [5 + 14, 3 * 14 +1, 6 + 14, 1, 7 + 14], [5 + 14*2, 6 + 14*2, 6 + 14*2, 6 + 14*2, 7 + 14*2]];
                 generate_base("base2", base1);
                 generate_base("base3", base2);
 
@@ -68,6 +50,15 @@
                     generate_base("base3", base2);
                 }
             </script>
+            <p>Guild Area shield level:</p>
+            <div class="progress">
+                <div class="progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"> 25%</div>
+            </div>
+            <p class="label">Artefact hunt progress:</p>
+            <div class="progress">
+                <div class="progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 85%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"> 85%</div>
+            </div>
+            <br/>
         </div>
         </div>
     </div>

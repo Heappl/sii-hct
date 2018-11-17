@@ -2,7 +2,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <div class="page-title">
     <div class="title_left">
-        <h3>Guild chat</h3>
+        <h3>Bug reporting and feedback</h3>
     </div>
     </div>
 
@@ -10,10 +10,10 @@
 
     <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
-        <div class="x_content">            
-            <ul id="chat-content"></ul>
+        <div class="x_content">
+            <div id="info"></div>
             <form action="">
-                <input id="m" autocomplete="off" /><button>Send</button>
+                <input type="text" id="m" autocomplete="off" /><button>Send</button>
             </form>
         </div>
     </div>
@@ -22,12 +22,10 @@
     $(function () {
         var socket = io();
         $('form').submit(function(){
-        socket.emit('chat_redcats', user + ": " + $('#m').val());
+        socket.emit('feedback', user + ": " + $('#m').val());
             $('#m').val('');
+            $('#info').html('<div class="alert alert-success" role="alert">Thanks for your report!</div>');
             return false;
-        });
-        socket.on('chat_redcats', function(msg){
-            $('#chat-content').append($('<li>').text(msg)).addClass("alert alert-info");
         });
     });
     </script>

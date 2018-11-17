@@ -27,7 +27,7 @@ L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
 
 var cat = L.marker([spot[0], spot[1] - 0.002 + Math.random() * 0.003]);
 cat.addTo(mymap)
-    .bindPopup("<b>You found a cat: " + "<img src=\"http://placekitten.com/g/50/50\"/><br/><a href=\"javascript:take_cat();\">Adopt a cat!</a>");
+    .bindPopup("<b>You found a cat: " + "<img src=\"http://placekitten.com/g/50/50\"/><br/><a href=\"javascript:take_cat();\">Save it!</a>");
 
 function take_cat(){
     if (cat != undefined) {
@@ -60,17 +60,6 @@ L.polygon([
     [spot[0] - 0.0123, spot[1] + 0.1],
 ], {color: 'red'}).addTo(mymap).bindPopup("Area under <b>Red Cats</b> control");
 
-
-var popup = L.popup();
-
-function onMapClick(e) {
-    popup
-        .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + e.latlng.toString())
-        .openOn(mymap);
-}
-
-mymap.on('click', onMapClick);
 </script>
 </div>
 </div>
