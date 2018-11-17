@@ -25,10 +25,12 @@
             <div class="base2"></div>
             <div class="equipment">
                 <h3>Cats you saved from aliens:</h3>
-                <img src="https://loremflickr.com/120/120/cat"/>
-                <img src="https://loremflickr.com/120/121/cat"/>
-                <img src="https://loremflickr.com/120/119/cat"/>
-                <img src="https://loremflickr.com/120/122/cat"/>
+                <script>
+                    var n = <%=user.cats %>;
+                    for (var i = 0; i < n; i++) {
+                        document.writeln('<img src="http://placekitten.com/g/120/1' + (11 + i) + '"/>');
+                    }
+                </script>
             </div>
             <script>
                 var base0 = [[5, 6, 7], [5 + 14, 6 + 14, 7 + 14], [5 + 14*2, 6 + 14*2, 7 + 14*2]];

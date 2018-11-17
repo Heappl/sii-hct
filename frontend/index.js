@@ -8,6 +8,7 @@ var io = require('socket.io')(server);
 
 server.listen(8080);
 app.use(express.static('public'));
+app.use('/quests', express.static('public/gfx/'));
 app.use('/vendors', express.static('node_modules/gentelella/vendors/'));
 app.use('/css', express.static('node_modules/gentelella/build/css/'));
 app.use('/js', express.static('node_modules/gentelella/build/js/'));
@@ -22,6 +23,7 @@ var user = {
   guild: "Red Cats",
   kmp: 120,
   max_kmp: 250,
+  cats: 0,
 };
 
 app.get('/', function (req, res) {
@@ -42,6 +44,13 @@ app.get('/guildchat', function(req, res) {
 
 app.get('/bugreport', function(req, res) {
   res.render('pages/index', {content: 'bugreport', user: user});
+});
+
+app.get('/quest',(req,res) => {
+  console.log("quest done");
+  if (req.query.token === "secret_token") {
+    user.cats += 2;
+  }
 });
 
 io.on('connection', function(socket) {
