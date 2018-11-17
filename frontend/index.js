@@ -24,6 +24,7 @@ var user = {
   kmp: 120,
   max_kmp: 250,
   cats: 0,
+  points: 10,
 };
 
 app.get('/', function (req, res) {
@@ -50,6 +51,7 @@ app.get('/quest',(req,res) => {
   console.log("quest done");
   if (req.query.token === "secret_token") {
     user.cats += 2;
+    user.points += 30;
   }
 });
 
