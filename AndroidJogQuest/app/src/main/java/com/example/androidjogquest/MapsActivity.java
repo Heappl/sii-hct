@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -14,8 +15,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -26,8 +30,14 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Location mLastLocation = null;
+    private List<SpaceJunk> junks = new ArrayList<SpaceJunk>();
+    final double viewDistance = 0.01;
 
     private List<Location> path = new ArrayList<>();
+
+    MapsActivity() {
+        junks.add(new SpaceJunk());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +61,7 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback {
                     public void onReceive(Context context, Intent intent) {
                         Log.i("Main", "onReceive");
                         path = deserializePath(intent.getStringExtra("path"));
-                        markPosition();
+                        drawThings();
                     }
                 }, new IntentFilter("MovementTracker::Location"));
     }
@@ -74,26 +84,44 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback {
         startService(new Intent(this, MovementTracker.class));
     }
 
-    void markPosition() {
-        Log.i("Main", "markPosition");
+    Location getLast() {
+        return path.get(path.size() - 1);
+    }
+
+    void setCamera() {
+        Location last = getLast();
+        LatLng from = new LatLng(last.getLatitude() - viewDistance, last.getLongitude() - viewDistance);
+        LatLng to = new LatLng(last.getLatitude() + viewDistance, last.getLongitude() + viewDistance);
+        LatLngBounds bounds = new LatLngBounds(from, to);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
+    }
+
+    void drawPath() {
+        PolylineOptions polyline = new PolylineOptions();
+        for (Location loc : path) {
+            polyline.add(new LatLng(loc.getLatitude(), loc.getLongitude()));
+        }
+        mMap.addPolyline(polyline);
+    }
+
+    void drawNearbyObjects() {
+        for (SpaceJunk junk : junks) {
+            if (junk.getDistance(getLast()) < viewDistance) {
+                mMap.addGroundOverlay(new GroundOverlayOptions()
+                        .positionFromBounds(junk.getBounds())
+                        .image(BitmapDescriptorFactory.fromResource(R.drawable.galaxy_0)));
+            }
+        }
+    }
+
+    void drawThings() {
+        Log.i("Main", "drawThings");
         if ((mMap != null) && (path.size() > 0)) {
             mMap.clear();
-            PolylineOptions polyline = new PolylineOptions();
-            Double maxLat = -Double.MAX_VALUE;
-            Double minLat = Double.MAX_VALUE;
-            Double maxLong = -Double.MAX_VALUE;
-            Double minLong = Double.MAX_VALUE;
-            Log.i("Main", "markPosition : " + path.size());
-            for (Location loc : path) {
-                maxLat = Math.max(maxLat, loc.getLatitude());
-                minLat = Math.min(minLat, loc.getLatitude());
-                maxLong = Math.max(maxLong, loc.getLongitude());
-                minLong = Math.min(minLong, loc.getLongitude());
-                polyline.add(new LatLng(loc.getLatitude(), loc.getLongitude()));
-            }
-            LatLngBounds bounds = new LatLngBounds(new LatLng(minLat, minLong), new LatLng(maxLat, maxLong));
-            mMap.addPolyline(polyline);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
+
+            drawPath();
+            drawNearbyObjects();
+            setCamera();
         }
     }
 
@@ -110,6 +138,20 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         Log.i("Main", "onMapReady");
         mMap = googleMap;
-        markPosition();
+
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.e("MapsActivityRaw", "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("MapsActivityRaw", "Can't find style.", e);
+        }
+        drawThings();
     }
 }
