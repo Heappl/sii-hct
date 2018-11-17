@@ -51,14 +51,14 @@ public class MapsActivity extends RightHelper
     private List<GroundOverlay> overlays = new ArrayList<>();
     final double viewDistanceLat = 0.014;
     final double viewDistanceLong = 0.02;
-    final double distance = 1000;
+    final double distance = 3000;
     Location lastLocation = null;
 
     private HashMap<String, SpaceJunk> idToJunk = new HashMap<>();
     Marker marker = null;
     Circle range = null;
-
-    Marker currentMarker = null;
+    Circle otherRange = null;
+    Marker otherMarker = null;
 
     private List<Location> path = new ArrayList<>();
 
@@ -106,6 +106,7 @@ public class MapsActivity extends RightHelper
                         updatePosition();
                         path.clear();
                         drawNearbyObjects();
+                        drawOther();
                     }
                 }, new IntentFilter("MovementTracker::Location"));
     }
@@ -197,17 +198,49 @@ public class MapsActivity extends RightHelper
                     .center(getLastLatLng())
                     .radius(distance)
                     .strokeColor(Color.BLUE));
+            setCamera();
         } else {
             marker.setPosition(getLastLatLng());
             range.setCenter(getLastLatLng());
         }
-        setCamera();
         communication.pushPosition(getLastLatLng());
+    }
+
+    void drawOther() {
+        List<LatLng> other = communication.getOtherPath();
+        if (other.isEmpty()) {
+            return;
+        }
+        Log.i("Main", "Other: " + other.get(other.size() - 1).toString());
+
+        LatLng otherLatLng = other.get(other.size() - 1);
+        float[] results = new float[1];
+        Location.distanceBetween(otherLatLng.latitude, otherLatLng.longitude,
+                getLast().getLatitude(), getLast().getLongitude(), results);
+
+        if (otherMarker == null) {
+            otherMarker = mMap.addMarker(new MarkerOptions()
+                    .position(otherLatLng)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ship_small))
+                    .title("Enemy player")
+                    .visible(results[0] < distance));
+            otherRange = mMap.addCircle(new CircleOptions()
+                    .center(otherLatLng)
+                    .radius(distance)
+                    .strokeColor(Color.RED)
+                    .visible(results[0] < distance));
+        } else {
+            otherMarker.setPosition(otherLatLng);
+            otherRange.setCenter(other.get(other.size() - 1));
+            otherMarker.setVisible(results[0] < distance);
+            otherRange.setVisible(results[0] < distance);
+        }
     }
 
     void drawThings() {
         Log.i("Main", "drawThings");
         drawNearbyObjects();
+        drawOther();
 
         new Handler().postDelayed(this, 1000);
     }

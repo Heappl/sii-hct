@@ -19,13 +19,13 @@ def send_position(socket, lat, lon):
 if __name__ == "__main__":
     context = zmq.Context()
     socket = context.socket(zmq.REQ)
-    socket.connect("tcp://localhost:5555")
+    socket.connect("tcp://10.254.38.30:5555")
     gpx_file = open('run.gpx', 'r')
     gpx = gpxpy.parse(gpx_file)
     for track in gpx.tracks:
         for segment in track.segments:
             for pa, pb in pairwise(segment.points):
                 send_position(socket, pa.latitude, pa.longitude)
-                time.sleep((pb.time-pa.time).total_seconds())
+                time.sleep((pb.time-pa.time).total_seconds() / 4.0)
                 message = socket.recv()
                 

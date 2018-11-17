@@ -20,6 +20,7 @@ import java.util.List;
 
 public class CommunicationThread implements Runnable {
     List<LatLng> positions = new ArrayList<>();
+    List<LatLng> other_player_positions = new ArrayList<>();
 
     private String createReq() {
         List<LatLng> positions = getPositions();
@@ -43,7 +44,7 @@ public class CommunicationThread implements Runnable {
     public void run() {
         ZMQ.Context context = ZMQ.context(1);
         ZMQ.Socket socket = context.socket(SocketType.REQ);
-        if (socket.connect("tcp://10.254.38.12:5555")) {
+        if (socket.connect("tcp://10.254.38.30:5555")) {
             Log.i("Comms", "connected");
         } else {
             Log.e("Comms", "Couldn't connect");
@@ -67,7 +68,11 @@ public class CommunicationThread implements Runnable {
                     continue;
                 }
                 String response = socket.recvStr();
-                Log.i("Comms", response);
+                JSONObject obj = new JSONObject(response);
+                double latitude = Double.parseDouble(obj.getJSONArray("1").getString(0));
+                double longitude = Double.parseDouble(obj.getJSONArray("1").getString(1));
+                Log.i("Comms", "receive: " + latitude + ", " + longitude);
+                pushOtherPosition(new LatLng(latitude, longitude));
             }
         } catch (Throwable exception) {
             System.err.println(exception);
@@ -76,9 +81,23 @@ public class CommunicationThread implements Runnable {
         context.term();
     }
 
+    private synchronized void pushOtherPosition(LatLng other) {
+        other_player_positions.add(other);
+    }
+
+    public synchronized List<LatLng> getOtherPath() {
+        List<LatLng> ret = this.other_player_positions;
+        this.other_player_positions = new ArrayList<>();
+        return ret;
+    }
+
     private synchronized List<LatLng> getPositions() {
+        if (this.positions.isEmpty()) {
+            return new ArrayList<>();
+        }
         List<LatLng> ret = this.positions;
         this.positions = new ArrayList<>();
+        this.positions.add(ret.get(ret.size() - 1));
         return ret;
     }
 

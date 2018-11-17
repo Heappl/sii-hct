@@ -6,7 +6,7 @@ import sqlite3
 conn = sqlite3.connect('example.db')
 context = zmq.Context()
 socket = context.socket(zmq.REP)
-socket.bind("tcp://10.254.38.12:5555")
+socket.bind("tcp://10.254.38.30:5555")
 
 # the server should be able to collect live 
 # running position and propagate it to web app and phone app
