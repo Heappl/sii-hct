@@ -9,15 +9,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +26,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
@@ -40,16 +40,26 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MapsActivity extends RightHelper implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnGroundOverlayClickListener {
+public class MapsActivity extends RightHelper
+        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnGroundOverlayClickListener, Runnable {
 
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
-    private Location mLastLocation = null;
-    private List<SpaceJunk> junks = new ArrayList<SpaceJunk>();
+    private List<SpaceJunk> junks = new ArrayList<>();
+    private List<GroundOverlay> overlays = new ArrayList<>();
     final double viewDistanceLat = 0.014;
     final double viewDistanceLong = 0.02;
-    private HashMap<String, SpaceJunk> overlayToJunk = new HashMap<>();
+    final double distance = 1000;
+    Location lastLocation = null;
+
+    private HashMap<String, SpaceJunk> idToJunk = new HashMap<>();
+    Marker marker = null;
+    Circle range = null;
+
+    Marker currentMarker = null;
 
     private List<Location> path = new ArrayList<>();
 
@@ -58,13 +68,13 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
                 new LatLng(51.089666308, 17.017166598),
                 0.003, 0.005, "galaxy_0"));
         junks.add(new SpaceJunk("junkyard",
-                new LatLng(51.059666308, 17.007166598),
+                new LatLng(51.099666308, 17.007166598),
                 0.0005, 0.0007, "junk_ship_blue"));
         junks.add(new SpaceJunk("junkyard",
-                new LatLng(51.059666308, 17.027166598),
+                new LatLng(51.069666308, 17.027166598),
                 0.0005, 0.0007, "junk_ship_red"));
         junks.add(new SpaceJunk("base",
-                new LatLng(51.099366308, 17.017466598),
+                new LatLng(51.089666308, 17.019466598),
                 0.0005, 0.0007, "satellite"));
     }
 
@@ -90,7 +100,10 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
                     public void onReceive(Context context, Intent intent) {
                         Log.i("Main", "onReceive");
                         path = deserializePath(intent.getStringExtra("path"));
-                        drawThings();
+                        drawPath();
+                        updatePosition();
+                        path.clear();
+                        drawNearbyObjects();
                     }
                 }, new IntentFilter("MovementTracker::Location"));
     }
@@ -114,20 +127,17 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
     }
 
     Location getLast() {
-        return path.get(path.size() - 1);
+        return lastLocation;
     }
     LatLng getLastLatLng() {
         return new LatLng(getLast().getLatitude(), getLast().getLongitude());
     }
 
-    LatLngBounds getLastBounds() {
-        LatLng min = new LatLng(getLast().getLatitude() - 0.0003, getLast().getLongitude() - 0.0005);
-        LatLng max = new LatLng(getLast().getLatitude() + 0.0003, getLast().getLongitude() + 0.0005);
-        return new LatLngBounds(min, max);
-    }
-
     void setCamera() {
         Location last = getLast();
+        if (last == null) {
+            return;
+        }
         LatLng from = new LatLng(last.getLatitude() - viewDistanceLong, last.getLongitude() - viewDistanceLong);
         LatLng to = new LatLng(last.getLatitude() + viewDistanceLat, last.getLongitude() + viewDistanceLat);
         LatLngBounds bounds = new LatLngBounds(from, to);
@@ -135,45 +145,68 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
     }
 
     void drawPath() {
+        if (path.isEmpty()) {
+            return;
+        }
+        lastLocation = path.get(path.size() - 1);
         PolylineOptions polyline = new PolylineOptions().color(R.color.colorPath);
         for (Location loc : path) {
             polyline.add(new LatLng(loc.getLatitude(), loc.getLongitude()));
         }
         mMap.addPolyline(polyline);
-        mMap.addMarker(new MarkerOptions()
-                .position(getLastLatLng())
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ship_small)));
-        mMap.addCircle(new CircleOptions()
-                .center(getLastLatLng())
-                .radius(1000)
-                .strokeColor(Color.BLUE));
     }
 
     void drawNearbyObjects() {
-        for (SpaceJunk junk : junks) {
-            if (junk.getDistance(getLast(), viewDistanceLat, viewDistanceLong)) {
+        if (getLast() == null) {
+            return;
+        }
+        if (overlays.isEmpty()) {
+            for (SpaceJunk junk : junks) {
                 String imageName = junk.getImageName();
                 Resources resources = getResources();
                 final int resourceId = resources.getIdentifier(imageName, "drawable", getPackageName());
                 GroundOverlay overlay = mMap.addGroundOverlay(new GroundOverlayOptions()
                         .positionFromBounds(junk.getBounds())
                         .image(BitmapDescriptorFactory.fromResource(resourceId))
-                        .clickable(true));
-                overlayToJunk.put(overlay.getId(), junk);
+                        .clickable(true)
+                        .visible(junk.getDistance(getLast(), distance)));
+                idToJunk.put(overlay.getId(), junk);
+                overlays.add(overlay);
+            }
+        } else {
+            for (int i = 0; i < junks.size(); ++i) {
+                GroundOverlay overlay = overlays.get(i);
+                SpaceJunk junk = junks.get(i);
+                overlay.setPositionFromBounds(junk.getBounds());
+                overlay.setVisible(junk.getDistance(getLast(), distance));
             }
         }
     }
 
+    void updatePosition() {
+        if (getLast() == null) {
+            return;
+        }
+        if (marker == null) {
+            marker = mMap.addMarker(new MarkerOptions()
+                    .position(getLastLatLng())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ship_small)));
+            range = mMap.addCircle(new CircleOptions()
+                    .center(getLastLatLng())
+                    .radius(distance)
+                    .strokeColor(Color.BLUE));
+        } else {
+            marker.setPosition(getLastLatLng());
+            range.setCenter(getLastLatLng());
+        }
+        setCamera();
+    }
+
     void drawThings() {
         Log.i("Main", "drawThings");
-        if ((mMap != null) && (path.size() > 0)) {
-            mMap.clear();
+        drawNearbyObjects();
 
-            drawPath();
-            if (path.size() < 2)
-                setCamera();
-            drawNearbyObjects();
-        }
+        new Handler().postDelayed(this, 1000);
     }
 
     /**
@@ -205,6 +238,8 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
         } catch (Resources.NotFoundException e) {
             Log.e("MapsActivityRaw", "Can't find style.", e);
         }
+        drawPath();
+        updatePosition();
         drawThings();
     }
 
@@ -216,7 +251,7 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
 
     @Override
     public void onGroundOverlayClick(GroundOverlay groundOverlay) {
-        SpaceJunk junk = overlayToJunk.get(groundOverlay.getId());
+        SpaceJunk junk = idToJunk.get(groundOverlay.getId());
         if (junk == null) {
             Log.e("Main", "NO JUNK");
             return;
@@ -236,5 +271,10 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(layout);
         toast.show();
+    }
+
+    @Override
+    public void run() {
+        drawThings();
     }
 }

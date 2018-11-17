@@ -24,12 +24,17 @@ public class SpaceJunk {
         return this.imageName;
     }
 
-    public boolean getDistance(Location last, double latDist, double longDist) {
-        return (position.latitude - last.getLatitude() < latDist)
-                && (position.longitude - last.getLongitude() < longDist);
+    public boolean getDistance(Location last, double distance) {
+        float[] results = new float[1];
+        Location.distanceBetween(position.latitude, position.longitude,
+                last.getLatitude(), last.getLongitude(), results);
+        return results[0] < distance;
     }
 
     public LatLngBounds getBounds() {
+        if (getTitle().equals("base")) {
+            position = new LatLng(position.latitude, position.longitude + 0.0001);
+        }
         LatLng skytower_min = new LatLng(position.latitude - latSize, position.longitude - longSize);
         LatLng skytower_max = new LatLng(position.latitude + latSize, position.longitude + longSize);
         return new LatLngBounds(skytower_min, skytower_max);
