@@ -16,13 +16,6 @@
     </link>
     <type>RUNNING</type>
     <trkseg>
-      <trkpt lat="51.11515" lon="17.051265">
-        <time>2016-07-02T05:34:21Z</time>
-      </trkpt>
-      <trkpt lat="51.11515" lon="17.051265">
-        <ele>157.06</ele>
-        <time>2016-07-02T05:34:47Z</time>
-      </trkpt>
       <trkpt lat="51.114933" lon="17.051257">
         <ele>167.011</ele>
         <time>2016-07-02T05:34:53Z</time>

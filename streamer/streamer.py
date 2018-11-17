@@ -14,7 +14,7 @@ def pairwise(iterable):
 
 def send_position(socket, lat, lon):
     print('Point at ({0},{1})'.format(lat, lon))
-    socket.send_string('{0},{1}'.format(lat, lon))
+    socket.send_string('[{0},{1},{2}]'.format('1', lat, lon))
 
 if __name__ == "__main__":
     context = zmq.Context()
