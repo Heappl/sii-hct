@@ -1,5 +1,4 @@
 
-
 function getTile(i) {
     return [(i % 14) * -32, Math.floor(i / 14) * -32];
 }

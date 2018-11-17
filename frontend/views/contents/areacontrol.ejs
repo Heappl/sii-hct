@@ -2,7 +2,7 @@
 <div class="">
     <div class="page-title">
     <div class="title_left">
-        <h3>Area under control</h3>
+        <h3>Area control</h3>
     </div>
     </div>
 
@@ -25,20 +25,36 @@ L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(mymap);
 
-L.marker([spot[0], spot[1] - 0.002]).addTo(mymap)
-    .bindPopup("<b>You found a cat: " + "<img src=\"http://placekitten.com/g/50/50\"/>");
+var cat = L.marker([spot[0], spot[1] - 0.002 + Math.random() * 0.003]);
+cat.addTo(mymap)
+    .bindPopup("<b>You found a cat: " + "<img src=\"http://placekitten.com/g/50/50\"/><br/><a href=\"javascript:take_cat();\">Adopt a cat!</a>");
 
+function take_cat(){
+    if (cat != undefined) {
+        mymap.removeLayer(cat);
+    }
+}
 L.circle(spot, 500, {
-    color: 'red',
+    color: 'yellow',
     fillColor: '#f03',
     fillOpacity: 0.5
-}).addTo(mymap).bindPopup("Danger zone. You can find there aliens, monsters and wild cats.");
+}).addTo(mymap).bindPopup("Danger zone. You can find here aliens, valuable artefacts and cats.");
 
-// L.polygon([
-//     [51.509, -0.08],
-//     [51.503, -0.06],
-//     [51.51, -0.047]
-// ]).addTo(mymap).bindPopup("I am a polygon.");
+L.polygon([
+    [spot[0] + 0.0523, spot[1] -0.08],
+    [spot[0] + 0.0503, spot[1] -0.06],
+    [spot[0] + 0.051, spot[1] -0.047],
+    [spot[0] + 0.031, spot[1] -0.027],
+    [spot[0] + 0.0423, spot[1] -0.1],
+], {color: 'blue'}).addTo(mymap).bindPopup("Area under <b>Blue Fang</b> control");
+
+L.polygon([
+    [spot[0] + 0.0123, spot[1]  + 0.08],
+    [spot[0] + 0.0103, spot[1]  + 0.06],
+    [spot[0] + 0.021, spot[1]  + 0.047],
+    [spot[0] + 0.011, spot[1]  + 0.027],
+    [spot[0] - 0.0123, spot[1] + 0.1],
+], {color: 'red'}).addTo(mymap).bindPopup("Area under <b>Red Cats</b> control");
 
 
 var popup = L.popup();
