@@ -2,19 +2,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <% include ../parts/head %>
+<% include ../parts/head.ejs %>
+<style>
+    .team-red { color: red; }
+</style>
 </head>
-<body class="">
-<div class="wrapper">
-    <% include ../parts/header.ejs %>
-  <div class="content-wrapper">
-    <section class="content container-fluid">
+<body class="nav-md">
+<div class="container body">
 
-        <div class="content" id="renderer">
-           <p>here is something nice</p>
-        </div>
-    </section>
-  </div>
+<div class="main_container">
+<% include ../parts/header.ejs %>
+
+<% include ../parts/topnav.ejs %>
+
+<% include ../contents/mainbody.ejs %>
+
+<% include ../parts/footer.ejs %>
 </div>
+
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="vendors/jquery/dist/jquery.min.js"></script>
+    <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="vendors/fastclick/lib/fastclick.js"></script>
+    <script src="vendors/nprogress/nprogress.js"></script>
+    <script src="js/custom.min.js"></script>
 </body>
 </html>
