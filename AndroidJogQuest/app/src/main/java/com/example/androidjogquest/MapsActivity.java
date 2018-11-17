@@ -5,13 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,9 +38,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class MapsActivity extends RightHelper implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends RightHelper implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnGroundOverlayClickListener {
 
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
@@ -39,6 +49,7 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
     private List<SpaceJunk> junks = new ArrayList<SpaceJunk>();
     final double viewDistanceLat = 0.014;
     final double viewDistanceLong = 0.02;
+    private HashMap<String, SpaceJunk> overlayToJunk = new HashMap<>();
 
     private List<Location> path = new ArrayList<>();
 
@@ -132,6 +143,10 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
         mMap.addMarker(new MarkerOptions()
                 .position(getLastLatLng())
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ship_small)));
+        mMap.addCircle(new CircleOptions()
+                .center(getLastLatLng())
+                .radius(1000)
+                .strokeColor(Color.BLUE));
     }
 
     void drawNearbyObjects() {
@@ -140,10 +155,11 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
                 String imageName = junk.getImageName();
                 Resources resources = getResources();
                 final int resourceId = resources.getIdentifier(imageName, "drawable", getPackageName());
-                mMap.addGroundOverlay(new GroundOverlayOptions()
+                GroundOverlay overlay = mMap.addGroundOverlay(new GroundOverlayOptions()
                         .positionFromBounds(junk.getBounds())
                         .image(BitmapDescriptorFactory.fromResource(resourceId))
                         .clickable(true));
+                overlayToJunk.put(overlay.getId(), junk);
             }
         }
     }
@@ -174,6 +190,7 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
         Log.i("Main", "onMapReady");
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
+        mMap.setOnGroundOverlayClickListener(this);
 
         try {
             // Customise the styling of the base map using a JSON object defined
@@ -195,5 +212,29 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback, Goo
     public boolean onMarkerClick(Marker marker) {
         setCamera();
         return false;
+    }
+
+    @Override
+    public void onGroundOverlayClick(GroundOverlay groundOverlay) {
+        SpaceJunk junk = overlayToJunk.get(groundOverlay.getId());
+        if (junk == null) {
+            Log.e("Main", "NO JUNK");
+            return;
+        }
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_layout, (ViewGroup) findViewById(R.id.toast_layout_root));
+
+        TextView text = (TextView) layout.findViewById(R.id.text);
+
+        text.setText(junk.getTitle());
+        ImageView image = (ImageView) layout.findViewById(R.id.image);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.skytower);
+        image.setImageBitmap(icon);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.show();
     }
 }
