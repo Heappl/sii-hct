@@ -1,7 +1,7 @@
 <div class="col-md-3 left_col">
 <div class="left_col scroll-view">
     <div class="navbar nav_title" style="border: 0;">
-    <a href="#" class="site_title"><i class="fa fa-gamepad"></i> <span>FitQuest</span></a>
+    <a href="/" class="site_title"><i class="fa fa-gamepad"></i><span>FitQuest</span></a>
     </div>
 
     <div class="clearfix"></div>
@@ -12,18 +12,18 @@
     </div>
     <div class="profile_info">
         <span>Hey,</span>
-        <h2>Kitty Katze!</h2>
+        <h2><%=user.name %>!</h2>
     </div>
     <div class="project_detail">
-            <ul>
-                <li>Level: <b>28</b></li>
-                <li>Energy: 143 / 250 kmp</li>
-                <li>Guild: <span class="team-red">Red Dragons</span></li>
-                <li>Power Source: <img src="https://www.wykop.pl/cdn/c3201142/comment_mzEIBHomzJdV4YUh2MWedREdoEoqAE7P,w400.jpg" style="width:15px"/></li>
-            </ul>
-        </div>
-        
-        <br />
+    <ul>
+        <li>Level: <b> <%=user.level %></b></li>
+        <li>Energy: <%=user.kmp %> / <%=user.max_kmp %> kmp</li>
+        <li>Guild: <span class="team-red"><%=user.guild %></span></li>
+        <li>Power Source: <i class="fa fa-gamepad"> </i> <img src="https://www.wykop.pl/cdn/c3201142/comment_mzEIBHomzJdV4YUh2MWedREdoEoqAE7P,w400.jpg" style="width:15px"/></li>
+    </ul>
+    </div>
+    
+    <br />
     <div class="clearfix"></div>
     </div>
     <br/>

@@ -6,6 +6,7 @@
 <style>
     .team-red { color: red; }
 </style>
+    <script src="/gamejs/map.js"></script>
 </head>
 <body class="nav-md">
 <div class="container body">
@@ -15,7 +16,11 @@
 
 <% include ../parts/topnav.ejs %>
 
-<% include ../contents/mainbody.ejs %>
+<% if (content === 'area') { %>
+    <%- include ../contents/areacontrol.ejs %>
+<% } else { %>
+    <%- include ../contents/mainbody.ejs %>
+<% } %>
 
 <% include ../parts/footer.ejs %>
 </div>
