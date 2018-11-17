@@ -7,21 +7,26 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 public class SpaceJunk {
-    String name, imageName;
+    String name, imageName, rewardName;
     LatLng position;
     double latSize;
     double longSize;
 
-    SpaceJunk(String name, LatLng position, double latSize, double longSize, String resourceName) {
+    SpaceJunk(String name, LatLng position, double latSize, double longSize, String resourceName,
+              String rewardName) {
         this.name = name;
         this.position = position;
         this.latSize = latSize;
         this.longSize = longSize;
         this.imageName = resourceName;
+        this.rewardName = rewardName;
     }
 
     public String getImageName() {
         return this.imageName;
+    }
+    public String getRewardName() {
+        return this.rewardName;
     }
 
     public boolean getDistance(Location last, double distance) {

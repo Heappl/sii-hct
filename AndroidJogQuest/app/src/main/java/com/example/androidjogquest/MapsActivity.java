@@ -68,16 +68,16 @@ public class MapsActivity extends RightHelper
     MapsActivity() {
         junks.add(new SpaceJunk("SkyTower",
                 new LatLng(51.089666308, 17.017166598),
-                0.003, 0.005, "galaxy_0"));
+                0.003, 0.005, "galaxy_0", "skytower"));
         junks.add(new SpaceJunk("junkyard",
                 new LatLng(51.099666308, 17.007166598),
-                0.0005, 0.0007, "junk_ship_blue"));
+                0.0005, 0.0007, "junk_ship_blue", "cat1"));
         junks.add(new SpaceJunk("junkyard",
                 new LatLng(51.069666308, 17.027166598),
-                0.0005, 0.0007, "junk_ship_red"));
+                0.0005, 0.0007, "junk_ship_red",  "cat2"));
         junks.add(new SpaceJunk("base",
                 new LatLng(51.089666308, 17.019466598),
-                0.0005, 0.0007, "satellite"));
+                0.0005, 0.0007, "satellite", "cat3"));
     }
 
     @Override
@@ -300,7 +300,8 @@ public class MapsActivity extends RightHelper
 
         text.setText(junk.getTitle());
         ImageView image = (ImageView) layout.findViewById(R.id.image);
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.skytower);
+        final int catId = getResources().getIdentifier(junk.getRewardName(), "drawable", getPackageName());
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), catId);
         image.setImageBitmap(icon);
 
         Toast toast = new Toast(getApplicationContext());
