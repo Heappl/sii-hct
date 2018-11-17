@@ -29,6 +29,7 @@ public class RightHelper extends FragmentActivity implements ActivityCompat.OnRe
         if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{permission}, sPermissionCode);
             onPermissionGranted.put(permission, handler);
+            return;
         }
         handler.onPermissionGranted();
     }

@@ -37,7 +37,6 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mapFragment.getMapAsync(this);
 
         requestLocationPermission(new PermissionHandler() {
             @Override
@@ -84,6 +83,7 @@ public class MapsActivity extends RightHelper implements OnMapReadyCallback {
             Double minLat = Double.MAX_VALUE;
             Double maxLong = -Double.MAX_VALUE;
             Double minLong = Double.MAX_VALUE;
+            Log.i("Main", "markPosition : " + path.size());
             for (Location loc : path) {
                 maxLat = Math.max(maxLat, loc.getLatitude());
                 minLat = Math.min(minLat, loc.getLatitude());
