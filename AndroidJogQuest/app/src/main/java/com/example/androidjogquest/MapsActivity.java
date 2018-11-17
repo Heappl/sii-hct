@@ -40,8 +40,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+
 
 public class MapsActivity extends RightHelper
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnGroundOverlayClickListener, Runnable {
@@ -62,6 +61,9 @@ public class MapsActivity extends RightHelper
     Marker currentMarker = null;
 
     private List<Location> path = new ArrayList<>();
+
+    private CommunicationThread communication = new CommunicationThread();
+    private Thread communicationThread = new Thread(communication);
 
     MapsActivity() {
         junks.add(new SpaceJunk("SkyTower",
@@ -200,6 +202,7 @@ public class MapsActivity extends RightHelper
             range.setCenter(getLastLatLng());
         }
         setCamera();
+        communication.pushPosition(getLastLatLng());
     }
 
     void drawThings() {
@@ -241,6 +244,7 @@ public class MapsActivity extends RightHelper
         drawPath();
         updatePosition();
         drawThings();
+        communicationThread.start();
     }
 
     @Override
