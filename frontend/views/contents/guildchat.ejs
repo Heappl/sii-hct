@@ -1,5 +1,5 @@
 <div class="right_col" role="main">
-<div class="">
+    <script src="/socket.io/socket.io.js"></script>
     <div class="page-title">
     <div class="title_left">
         <h3>Guild chat</h3>
@@ -17,7 +17,25 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+
+            <ul id="chat-content"></ul>
+            <form action="">
+                <input id="m" autocomplete="off" /><button>Send</button>
+            </form>
         </div>
     </div>
+    <script>
+    $(function () {
+        var socket = io();
+        $('form').submit(function(){
+        socket.emit('chat_redcats', $('#m').val());
+            $('#m').val('');
+            return false;
+        });
+        socket.on('chat_redcats', function(msg){
+            $('#chat-content').append($('<li>').text(msg)).addClass("alert alert-info");
+        });
+    });
+    </script>
 </div>
 </div>

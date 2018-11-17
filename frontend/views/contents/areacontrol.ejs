@@ -34,6 +34,10 @@ function take_cat(){
         mymap.removeLayer(cat);
     }
 }
+
+L.marker([51.109062,17.0023325]).addTo(mymap)
+.bindPopup("<h5>Squashator attacks!</h5> Play squash to fight this monster.<br/>Current HP: 20/100<br/>" + 
+"<img src=\"https://upload.wikimedia.org/wikipedia/commons/3/38/Squash_Ball_Dunlop_Revelation_Pro_1.jpg\" style=\"width:80px\"><br/><b>Reward</b>: 30 points 2 kittens saved.")
 L.circle(spot, 500, {
     color: 'yellow',
     fillColor: '#f03',

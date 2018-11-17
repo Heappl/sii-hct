@@ -4,6 +4,8 @@ var app = express();
 var session = require('express-session');
 var server = require('http').Server(app);
 
+var io = require('socket.io')(server);
+
 server.listen(8080);
 app.use(express.static('public'));
 app.use('/vendors', express.static('node_modules/gentelella/vendors/'));
@@ -28,4 +30,18 @@ app.get('/', function (req, res) {
 
 app.get('/area', function(req, res) {
   res.render('pages/index', {content: 'area', user: user});
+});
+
+app.get('/guildchat', function(req, res) {
+  res.render('pages/index', {content: 'guildchat', user: user});
+});
+
+io.on('connection', function(socket){
+  socket.broadcast.emit('chat_redcats', '(new user joined chat)');
+  socket.on('disconnect', function(){
+    socket.broadcast.emit('chat_redcats', '(user left chat)');
+  });
+  socket.on('chat_redcats', function(msg){
+    io.emit('chat_redcats', msg);
+  });
 });
