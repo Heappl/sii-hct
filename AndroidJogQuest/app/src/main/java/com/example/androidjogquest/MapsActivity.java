@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class MapsActivity extends RightHelper
     private GoogleMap mMap;
     private List<SpaceJunk> junks = new ArrayList<>();
     private List<GroundOverlay> overlays = new ArrayList<>();
+    private List<AreaControl> areas = new ArrayList<>();
     final double viewDistanceLat = 0.014;
     final double viewDistanceLong = 0.02;
     final double distance = 3000;
@@ -75,9 +77,26 @@ public class MapsActivity extends RightHelper
         junks.add(new SpaceJunk("junkyard",
                 new LatLng(51.069666308, 17.027166598),
                 0.0005, 0.0007, "junk_ship_red",  "cat2"));
+        junks.add(new SpaceJunk("junkyard",
+                new LatLng(51.088666308, 17.018166598),
+                0.0005, 0.0007, "junk_ship_red",  "cat3"));
         junks.add(new SpaceJunk("base",
                 new LatLng(51.089666308, 17.019466598),
                 0.0005, 0.0007, "satellite", "cat3"));
+        junks.add(new SpaceJunk("commsat",
+                new LatLng(51.109666308, 17.016466598),
+                0.0005, 0.0007, "satellite", "cat1"));
+        junks.add(new SpaceJunk("kronos",
+                new LatLng(51.109666308, 17.025466598),
+                0.001, 0.0016, "planet", "planet"));
+        areas.add(new AreaControl(
+                new LatLng(51.109062, 17.0023325),
+                new double[]{0.0523, -0.08, 0.0503, -0.06, 0.051, -0.047, 0.031, -0.027, 0.0423,-0.1},
+                Color.BLUE));
+        areas.add(new AreaControl(
+                new LatLng(51.109062, 17.0023325),
+                new double[]{0.0123, 0.08, 0.0103, 0.06, 0.021, 0.047, 0.011, 0.027, -0.0123, 0.1},
+                Color.RED));
     }
 
     @Override
@@ -237,9 +256,17 @@ public class MapsActivity extends RightHelper
         }
     }
 
+    void drawAreas() {
+        for (AreaControl area : areas) {
+            mMap.addPolygon(new PolygonOptions().addAll(
+                    area.getPolygon()).strokeColor(area.getColor()).fillColor(area.getFillColor()));
+        }
+    }
+
     void drawThings() {
         Log.i("Main", "drawThings");
         drawNearbyObjects();
+        drawAreas();
         drawOther();
 
         new Handler().postDelayed(this, 1000);
@@ -306,7 +333,7 @@ public class MapsActivity extends RightHelper
 
         Toast toast = new Toast(getApplicationContext());
         toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setDuration(Toast.LENGTH_LONG);
         toast.setView(layout);
         toast.show();
     }

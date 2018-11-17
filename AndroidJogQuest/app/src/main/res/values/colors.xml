@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorPath">#00FF00</color>
+    <color name="fillRed">#8800FF00</color>
+    <color name="fillBlue">#880000FF</color>
 </resources>

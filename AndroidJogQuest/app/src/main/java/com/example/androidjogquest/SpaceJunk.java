@@ -38,7 +38,7 @@ public class SpaceJunk {
 
     public LatLngBounds getBounds() {
         if (getTitle().equals("base")) {
-            position = new LatLng(position.latitude, position.longitude + 0.0001);
+            position = new LatLng(position.latitude - 0.0001, position.longitude + 0.0001);
         }
         LatLng skytower_min = new LatLng(position.latitude - latSize, position.longitude - longSize);
         LatLng skytower_max = new LatLng(position.latitude + latSize, position.longitude + longSize);
