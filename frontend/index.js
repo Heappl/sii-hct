@@ -18,6 +18,7 @@ app.set('view engine', 'ejs');
 // example user
 // todo: db connection
 var user = {
+  type: 2,
   level: 28,
   name: "Kitty Katze",
   guild: "Red Cats",
@@ -40,6 +41,16 @@ app.get('/wtf', function(req, res) {
 });
 
 app.get('/quest_squashor', function(req, res) {
+  var user = {
+    type: 0,
+    level: 42,
+    name: "Hasta Tavista",
+    guild: "Quest Special Force",
+    kmp: 9000,
+    max_kmp: 1,
+    cats: 100,
+    points: 9000,
+  };
   res.render('pages/index', {content: 'squashor', user: user});
 });
 

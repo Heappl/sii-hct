@@ -8,7 +8,11 @@
 
     <div class="profile clearfix">
     <div class="profile_pic">
+        <% if (user.type === 0) { %>
         <img src="http://placekitten.com/g/250/250" alt="..." class="img-circle profile_img">
+        <% } else { %>
+        <img src="http://placekitten.com/g/249/249" alt="..." class="img-circle profile_img"> 
+        <% } %>
     </div>
     <div class="profile_info">
         <span>Hey,</span>
@@ -19,7 +23,9 @@
         <li>Level: <b> <%=user.level %></b></li>
         <li>Energy: <%=user.kmp %> / <%=user.max_kmp %> kmp</li>
         <li>Guild: <span class="team-red"><%=user.guild %></span></li>
+        <% if (user.type === 2) { %>
         <li>Power Source: <i class="fa fa-gamepad"> </i> <img src="https://www.wykop.pl/cdn/c3201142/comment_mzEIBHomzJdV4YUh2MWedREdoEoqAE7P,w400.jpg" style="width:15px"/></li>
+        <% } %>
     </ul>
     </div>
     
