@@ -39,6 +39,10 @@ app.get('/wtf', function(req, res) {
   res.render('pages/index', {content: 'wtf', user: user});
 });
 
+app.get('/quest_squashor', function(req, res) {
+  res.render('pages/index', {content: 'squashor', user: user});
+});
+
 app.get('/guildchat', function(req, res) {
   res.render('pages/index', {content: 'guildchat', user: user});
 });
