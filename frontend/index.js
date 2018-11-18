@@ -17,6 +17,7 @@ app.set('view engine', 'ejs');
 
 // example user
 // todo: db connection
+// happens: never
 var user = {
   type: 2,
   level: 28,
